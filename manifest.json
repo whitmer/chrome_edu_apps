@@ -1,15 +1,15 @@
 {
-  "name": "MoodleEduApps",
+  "name": "EduApps",
   "manifest_version": 2,
   "version": "1.0",
-  "description": "Loads edu-apps picker within Moodle tool config page",
+  "description": "Loads edu-apps picker within LTI config page of various LMSs",
   "permissions": [
     "tabs", "https://www.google.com/"
   ],
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["moodle_check.js"]
+      "js": ["lms_check.js"]
     }
   ]
 }
