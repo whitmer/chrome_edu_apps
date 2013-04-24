@@ -8,12 +8,22 @@ function populateLtiForm(data) {
   if($("#id_resourcekey:visible").length == 0) {
     $("#general .advancedbutton .showadvancedbtn").click();
   }
+  if($("#tab-tools .add_tool_link").length) {
+    $("#tab-tools .add_tool_link").click();
+  }
   // Populate settings (make sure to override existing values)
-  $("#id_name,#id_lti_typename").val(data.title);
+  $("#id_name,#id_lti_typename,#external_tool_name").val(data.title);
   $("#id_toolurl,#id_lti_toolurl").val(data.url || data.domain);
   $("#id_securetoolurl").val(data.url.match(/^https/) ? data.url : "");
-  $("#id_resourcekey,#id_lti_resourcekey").val(data.key);
-  $("#id_password,#id_lti_password").val(data.secret);
+  $("#id_resourcekey,#id_lti_resourcekey,#external_tool_consumer_key").val(data.key);
+  $("#id_password,#id_lti_password,#external_tool_shared_secret").val(data.secret);
+  $("#external_tool_config_type").val("by_url").change();
+  $("#external_tool_form .config_type").hide().filter(".by_url").show();
+  setTimeout(function() {
+    $("#external_tool_config_type").change();
+    console.log($("#external_tool_config_type")[0]);
+  }, 500);
+  $("#external_tool_config_url").val(data.config_url);
   var iconUrl = (data.settings && data.settings.icon_url) || "";
   $("#id_icon").val(iconUrl);
   $("#id_secureicon").val(iconUrl.match(/^https/) ? iconUrl : "");
@@ -64,12 +74,15 @@ for(var idx in elems) {
     found = true;
   }
 }
+if(document.getElementById('external_tools') && location.href.match(/settings/)) {
+  found = true;
+}
 if(found) {
-  $("#general .fcontainer:first,#setup .fcontainer").prepend("<div style='text-align: center; font-size: 24px;'><a href='#' class='edu_apps'><img src='" + eduApps + "/preview.gif' style='height: 16px;'/> Find in the App Center</a></div>");
+  $("#general .fcontainer:first,#setup .fcontainer,#tab-tools .button-container").prepend("<div style='text-align: center; font-size: 24px;'><a href='#' class='edu_apps'><img src='" + eduApps + "/preview.gif' style='height: 16px;'/> Find in the App Center</a></div>");
   $("body").on('click', '.edu_apps', function(event) {
     event.preventDefault();
     closeDialog();
-    var $dialog = $("<div id='edu_apps' style='position: fixed; top: 50px; left: 50px; text-align: right; background: #fff; border: 2px solid #888;'/>");
+    var $dialog = $("<div id='edu_apps' style='position: fixed; z-index: 99999; top: 50px; left: 50px; text-align: right; background: #fff; border: 2px solid #888;'/>");
     var width = $(window).width() - 100;
     var height = $(window).height() - 100;
     $dialog.append("<a href='#' class='close'>close</a>&nbsp;&nbsp;<br/><iframe src='" + eduApps + "/select.html' style='width: " + width + "px; height: " + height + "px;' frameborder='0'></iframe>");
@@ -84,8 +97,8 @@ if(found) {
   });
   window.addEventListener("message", function(event) {
     if(event.data && event.data.action == "InstallEduApp") {
-      populateLtiForm(event.data);
       closeDialog();
+      populateLtiForm(event.data);
     }
   }, false);
 }
