@@ -8,5 +8,8 @@
       "matches": ["http://*/*", "https://*/*"],
       "js": ["lms_check.js"]
     }
-  ]
+  ],
+  "icons": {
+    "128": "icon.png"
+  }
 }

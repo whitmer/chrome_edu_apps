@@ -1,10 +1,15 @@
 EduApps Chrome Extension
 =========================
 
-Right now this is Moodle and Canvas-only. I'll be adding more
-LMSs as we go. Basically this embeds the edu-apps.org
+Basically this embeds the edu-apps.org
 interface into various LMSs to make it easier to
 configure LTI apps that are available on that site.
+
+Right now it's been configured to work in:
+
+- Canvas
+- Moodle
+- CourseSites (Blackboard)
 
 To try it out, load the .crx file in Chrome to 
 install the extension. Do this by going to Tools -> Extensions

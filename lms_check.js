@@ -1,62 +1,66 @@
+var $doc = null;
 var eduApps = "https://www.edu-apps.org";
-function populateLtiForm(data) {
+function populateLtiForm(data, $obj) {
   // Only supports apps with an actual launch URL right now...
-  if(!data.url && $("#id_lti_toolurl").length == 0) {
+  if(!data.url && $obj.find("#id_lti_toolurl").length == 0) {
     alert("Domain-level tools aren't supported at the teacher level.");
   }
   // Click "Show Advanced" if advanced fields are hidden
-  if($("#id_resourcekey:visible").length == 0) {
-    $("#general .advancedbutton .showadvancedbtn").click();
+  if($obj.find("#id_resourcekey:visible").length == 0) {
+    $obj.find("#general .advancedbutton .showadvancedbtn").click();
   }
-  if($("#tab-tools .add_tool_link").length) {
-    $("#tab-tools .add_tool_link").click();
+  if($obj.find("#tab-tools .add_tool_link").length) {
+    $obj.find("#tab-tools .add_tool_link").click();
   }
   // Populate settings (make sure to override existing values)
-  $("#id_name,#id_lti_typename,#external_tool_name").val(data.title);
-  $("#id_toolurl,#id_lti_toolurl").val(data.url || data.domain);
-  $("#id_securetoolurl").val(data.url.match(/^https/) ? data.url : "");
-  $("#id_resourcekey,#id_lti_resourcekey,#external_tool_consumer_key").val(data.key);
-  $("#id_password,#id_lti_password,#external_tool_shared_secret").val(data.secret);
-  $("#external_tool_config_type").val("by_url").change();
-  $("#external_tool_form .config_type").hide().filter(".by_url").show();
+  $obj.find("#id_name,#id_lti_typename,#external_tool_name,#user_title").val(data.title);
+  $obj.find("#id_toolurl,#id_lti_toolurl,#url").val(data.url || data.domain);
+  $obj.find("#bltiToolProvider").attr('checked', true);
+  $obj.find("#toolProviderConfigContainer").show();
+  $obj.find("#toolProviderConfigContainer .subList li").show().filter("#bltiXmlElement").hide();
+  $obj.find("#id_securetoolurl").val(data.url.match(/^https/) ? data.url : "");
+  $obj.find("#id_resourcekey,#id_lti_resourcekey,#external_tool_consumer_key,#bltiKey").val(data.key);
+  $obj.find("#id_password,#id_lti_password,#external_tool_shared_secret,#bltiSecret").val(data.secret);
+  $obj.find("#external_tool_config_type").val("by_url").change();
+  $obj.find("#external_tool_form .config_type").hide().filter(".by_url").show();
   setTimeout(function() {
-    $("#external_tool_config_type").change();
-    console.log($("#external_tool_config_type")[0]);
+    $obj.find("#external_tool_config_type").change();
+    $obj.find("#bltiToolProvider").change().trigger('change').triggerHandler('change').click();
   }, 500);
-  $("#external_tool_config_url").val(data.config_url);
+  $obj.find("#external_tool_config_url").val(data.config_url);
   var iconUrl = (data.settings && data.settings.icon_url) || "";
-  $("#id_icon").val(iconUrl);
-  $("#id_secureicon").val(iconUrl.match(/^https/) ? iconUrl : "");
+  $obj.find("#id_icon").val(iconUrl);
+  $obj.find("#id_secureicon").val(iconUrl.match(/^https/) ? iconUrl : "");
   if(data.privacy_level == "anonymous") {
-    $("#id_instructorchoicesendname").attr('checked', false);
-    $("#id_instructorchoicesendemailaddr").attr('checked', false);
-    $("#id_lti_sendname").val("0");
-    $("#id_lti_sendemailaddr").val("0");
+    $obj.find("#id_instructorchoicesendname").attr('checked', false);
+    $obj.find("#id_instructorchoicesendemailaddr").attr('checked', false);
+    $obj.find("#id_lti_sendname").val("0");
+    $obj.find("#id_lti_sendemailaddr").val("0");
   } else if(data.privacy_level == "name_only") {
-    $("#id_instructorchoicesendname").attr('checked', true);
-    $("#id_instructorchoicesendemailaddr").attr('checked', false);
-    $("#id_lti_sendname").val("1");
-    $("#id_lti_sendemailaddr").val("0");
+    $obj.find("#id_instructorchoicesendname").attr('checked', true);
+    $obj.find("#id_instructorchoicesendemailaddr").attr('checked', false);
+    $obj.find("#id_lti_sendname").val("1");
+    $obj.find("#id_lti_sendemailaddr").val("0");
   } else if(data.privacy_level == "email_only") {
-    $("#id_instructorchoicesendname").attr('checked', false);
-    $("#id_instructorchoicesendemailaddr").attr('checked', true);
-    $("#id_lti_sendname").val("0");
-    $("#id_lti_sendemailaddr").val("1");
+    $obj.find("#id_instructorchoicesendname").attr('checked', false);
+    $obj.find("#id_instructorchoicesendemailaddr").attr('checked', true);
+    $obj.find("#id_lti_sendname").val("0");
+    $obj.find("#id_lti_sendemailaddr").val("1");
   } else {
-    $("#id_instructorchoicesendname").attr('checked', true);
-    $("#id_instructorchoicesendemailaddr").attr('checked', true);
-    $("#id_lti_sendname").val("1");
-    $("#id_lti_sendemailaddr").val("1");
+    $obj.find("#id_instructorchoicesendname").attr('checked', true);
+    $obj.find("#id_instructorchoicesendemailaddr").attr('checked', true);
+    $obj.find("#id_lti_sendname").val("1");
+    $obj.find("#id_lti_sendemailaddr").val("1");
   }
   if(data.custom_fields) {
     var str = "";
     for(var idx in data.custom_fields) {
       str = str + idx + "=" + data.custom_fields[idx] + "\n";
     }
-    $("#id_instructorcustomparameters,#id_lti_customparameters").val(str);
+    $obj.find("#id_instructorcustomparameters,#id_lti_customparameters,#bltiCustomParameters").val(str);
   }
-  $("#id_lti_coursevisible").attr('checked', true);
-  $("#id_lti_forcessl").attr('checked', !!(data.url && data.url.match(/^https/)));
+  $obj.find("#id_lti_coursevisible").attr('checked', true);
+  $obj.find("#id_lti_forcessl").attr('checked', !!(data.url && data.url.match(/^https/)));
 }
 /*! jQuery v2.0.0 | (c) 2005, 2013 jQuery Foundation, Inc. | jquery.org/license
 //@ sourceMappingURL=jquery.min.map
@@ -68,18 +72,32 @@ if(x.isFunction(n))while(r=o[i++])"+"===r[0]?(r=r.slice(1)||"*",(e[r]=e[r]||[]).
 
 // Moodle-specific check for correct config page
 var elems = document.getElementsByClassName('main');
-var found = false;
 for(var idx in elems) {
   if(elems[idx] && elems[idx].tagName == 'H2' && elems[idx].innerHTML.match(/Adding a new External Tool|External Tool Configuration/)) {
-    found = true;
+    $doc = $(document);
   }
 }
 if(document.getElementById('external_tools') && location.href.match(/settings/)) {
-  found = true;
+  $doc = $(document);
 }
-if(found) {
-  $("#general .fcontainer:first,#setup .fcontainer,#tab-tools .button-container").prepend("<div style='text-align: center; font-size: 24px;'><a href='#' class='edu_apps'><img src='" + eduApps + "/preview.gif' style='height: 16px;'/> Find in the App Center</a></div>");
-  $("body").on('click', '.edu_apps', function(event) {
+if(document.getElementById('bbFrameset') && document.getElementById('contentFrame') && document.getElementById('contentFrame').contentDocument) {
+  $doc = $(document.getElementById('contentFrame').contentDocument);
+  var lastUrl = null;
+  setInterval(function() {
+    var doc = document.getElementById('contentFrame') && document.getElementById('contentFrame').contentDocument;
+    if(doc) {
+      $doc = $(doc.getElementsByTagName("html")[0]);
+      if(document.getElementById('contentFrame').contentDocument.location.href != lastUrl) {
+        lastUrl = document.getElementById('contentFrame').contentDocument.location.href.split(/#/)[0];
+        embedAppCenterLink();
+      }
+    }
+  }, 500);
+}
+function embedAppCenterLink() {
+  $doc.find("#general .fcontainer:first,#setup .fcontainer,#tab-tools .button-container,#stepcontent1").find(".edu_apps").remove();
+  $doc.find("#general .fcontainer:first,#setup .fcontainer,#tab-tools .button-container,#stepcontent1").prepend("<div style='text-align: center; font-size: 24px;'><a href='#' class='edu_apps'><img src='" + eduApps + "/preview.gif' style='height: 16px;'/> Find in the App Center</a></div>");
+  $doc.find("body").on('click', '.edu_apps', function(event) {
     event.preventDefault();
     closeDialog();
     var $dialog = $("<div id='edu_apps' style='position: fixed; z-index: 99999; top: 50px; left: 50px; text-align: right; background: #fff; border: 2px solid #888;'/>");
@@ -88,9 +106,12 @@ if(found) {
     $dialog.append("<a href='#' class='close'>close</a>&nbsp;&nbsp;<br/><iframe src='" + eduApps + "/select.html' style='width: " + width + "px; height: " + height + "px;' frameborder='0'></iframe>");
     $("body").append($dialog);
   });
-  function closeDialog() {
-    $("#edu_apps").remove();
-  };
+}
+function closeDialog() {
+  $("#edu_apps").remove();
+};
+if($doc) {
+  embedAppCenterLink();
   $("body").on('click', '#edu_apps .close', function(event) {
     event.preventDefault();
     closeDialog();
@@ -98,7 +119,7 @@ if(found) {
   window.addEventListener("message", function(event) {
     if(event.data && event.data.action == "InstallEduApp") {
       closeDialog();
-      populateLtiForm(event.data);
+      populateLtiForm(event.data, $doc);
     }
   }, false);
 }
